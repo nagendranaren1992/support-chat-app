@@ -3,6 +3,7 @@ import { SupportChatbotComponent } from '../../projects/support-chatbot/src/lib/
 
 @Component({
   selector: 'app-root',
+  standalone: true,
   imports: [SupportChatbotComponent],
   templateUrl: './app.html',
   styleUrl: './app.scss'

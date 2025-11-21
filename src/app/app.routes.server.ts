@@ -1,8 +1,3 @@
-import { RenderMode, ServerRoute } from '@angular/ssr';
-
-export const serverRoutes: ServerRoute[] = [
-  {
-    path: '**',
-    renderMode: RenderMode.Prerender
-  }
-];
+// Server routes configuration for Angular 17
+// This file can be used for SSR route configuration if needed
+export const serverRoutes: any[] = [];

@@ -91,6 +91,35 @@
           }
         }
       }
+    },
+    "support-chatbot": {
+      "projectType": "library",
+      "root": "projects/support-chatbot",
+      "sourceRoot": "projects/support-chatbot/src",
+      "prefix": "lib",
+      "architect": {
+        "build": {
+          "builder": "@angular/build:ng-packagr",
+          "configurations": {
+            "production": {
+              "tsConfig": "projects/support-chatbot/tsconfig.lib.prod.json"
+            },
+            "development": {
+              "tsConfig": "projects/support-chatbot/tsconfig.lib.json"
+            }
+          },
+          "defaultConfiguration": "production"
+        },
+        "test": {
+          "builder": "@angular/build:karma",
+          "options": {
+            "tsConfig": "projects/support-chatbot/tsconfig.spec.json"
+          }
+        }
+      }
     }
+  },
+  "cli": {
+    "analytics": false
   }
 }

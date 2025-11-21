@@ -1,9 +1,9 @@
 import { Component } from '@angular/core';
-import { RouterOutlet } from '@angular/router';
+import { SupportChatbotComponent } from '../../projects/support-chatbot/src/lib/support-chatbot.component';
 
 @Component({
   selector: 'app-root',
-  imports: [RouterOutlet],
+  imports: [SupportChatbotComponent],
   templateUrl: './app.html',
   styleUrl: './app.scss'
 })

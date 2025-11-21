@@ -1,0 +1,90 @@
+<div class="chatbot-container">
+  <div class="chatbot-header">
+    <div class="header-content">
+      <div class="bot-avatar">
+        <img src="/qurix.ico" alt="Bot Avatar" width="25" height="25" />
+      </div>
+      <div class="header-text">
+        <h3>Qurix Support Assistant</h3>
+        <span class="status-indicator">Online</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="messages" #scrollContainer>
+    <div *ngFor="let msg of messages; let i = index" [class.user]="msg.from === 'user'" [class.bot]="msg.from === 'bot'"
+      class="message-bubble">
+      <ng-container *ngIf="msg.videoUrl">
+        <div class="video-preview-container">
+          <video [src]="msg.videoUrl" controls></video>
+          <div class="video-actions" *ngIf="msg.isPendingUpload">
+            <button (click)="sendVideo(i)" class="icon-btn send-btn" title="Send">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M2.01 21L23 12L2.01 3L2 10L17 12L2 14L2.01 21Z" fill="currentColor" />
+              </svg>
+            </button>
+            <button (click)="cancelVideo(i)" class="icon-btn cancel-btn" title="Cancel">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path
+                  d="M19 6.41L17.59 5L12 10.59L6.41 5L5 6.41L10.59 12L5 17.59L6.41 19L12 13.41L17.59 19L19 17.59L13.41 12L19 6.41Z"
+                  fill="currentColor" />
+              </svg>
+            </button>
+          </div>
+          <div *ngIf="!msg.isPendingUpload" class="video-status">
+            {{ msg.text }}
+          </div>
+        </div>
+      </ng-container>
+      <div *ngIf="!msg.videoUrl" class="message-text">
+        {{ msg.text }}
+      </div>
+      <span class="message-time">{{ getCurrentTime() }}</span>
+    </div>
+  </div>
+
+  <div class="input-area">
+    <div class="input-wrapper">
+      <input [(ngModel)]="userInput" placeholder="Type your message..." (keyup.enter)="sendMessage()"
+        class="message-input" />
+      <div class="action-buttons">
+        <label for="file-input" class="icon-btn file-btn" title="Upload Image">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path
+              d="M19 12V19H5V12H3V19C3 20.1 3.9 21 5 21H19C20.1 21 21 20.1 21 19V12H19ZM13 12.67L15.59 10.09L17 11.5L12 16.5L7 11.5L8.41 10.09L11 12.67V3H13V12.67Z"
+              fill="currentColor" />
+          </svg>
+          <input id="file-input" type="file" accept="image/*" (change)="onScreenshotSelected($event)"
+            style="display: none;" />
+        </label>
+
+        <button (click)="startVideoRecording()" [disabled]="isRecording" class="icon-btn record-btn"
+          [class.recording]="isRecording" [title]="isRecording ? 'Recording...' : 'Record Screen'">
+          <svg *ngIf="!isRecording" width="20" height="20" viewBox="0 0 24 24" fill="none"
+            xmlns="http://www.w3.org/2000/svg">
+            <path
+              d="M12 14C13.1 14 14 13.1 14 12C14 10.9 13.1 10 12 10C10.9 10 10 10.9 10 12C10 13.1 10.9 14 12 14ZM12 4C13.1 4 14 3.1 14 2C14 0.9 13.1 0 12 0C10.9 0 10 0.9 10 2C10 3.1 10.9 4 12 4ZM12 20C13.1 20 14 19.1 14 18C14 16.9 13.1 16 12 16C10.9 16 10 16.9 10 18C10 19.1 10.9 20 12 20Z"
+              fill="currentColor" />
+          </svg>
+          <svg *ngIf="isRecording" width="20" height="20" viewBox="0 0 24 24" fill="none"
+            xmlns="http://www.w3.org/2000/svg">
+            <rect x="6" y="6" width="12" height="12" rx="2" fill="currentColor" />
+          </svg>
+        </button>
+
+        <button (click)="stopVideoRecording()" [disabled]="!isRecording" class="icon-btn stop-btn"
+          title="Stop Recording">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <rect x="6" y="6" width="12" height="12" rx="2" fill="currentColor" />
+          </svg>
+        </button>
+
+        <button (click)="sendMessage()" class="icon-btn send-btn" title="Send Message">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M2.01 21L23 12L2.01 3L2 10L17 12L2 14L2.01 21Z" fill="currentColor" />
+          </svg>
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

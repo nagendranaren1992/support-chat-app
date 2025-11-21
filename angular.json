@@ -121,6 +121,9 @@
       "architect": {
         "build": {
           "builder": "@angular-devkit/build-angular:ng-packagr",
+          "options": {
+            "project": "projects/support-chatbot/ng-package.json"
+          },
           "configurations": {
             "production": {
               "tsConfig": "projects/support-chatbot/tsconfig.lib.prod.json"

@@ -117,6 +117,52 @@
           }
         }
       }
+    },
+    "support-chatbot-element": {
+      "projectType": "application",
+      "root": "projects/support-chatbot",
+      "sourceRoot": "projects/support-chatbot/src",
+      "prefix": "lib",
+      "architect": {
+        "build": {
+          "builder": "@angular/build:application",
+          "options": {
+            "outputPath": "dist/support-chatbot-element",
+            "index": "projects/support-chatbot/src/index.html",
+            "browser": "projects/support-chatbot/src/main.ts",
+            "tsConfig": "projects/support-chatbot/tsconfig.lib.json",
+            "inlineStyleLanguage": "scss",
+            "assets": [
+              {
+                "glob": "**/*",
+                "input": "public"
+              }
+            ],
+            "styles": [],
+            "outputHashing": "all"
+          },
+          "configurations": {
+            "production": {
+              "budgets": [
+                {
+                  "type": "initial",
+                  "maximumWarning": "1MB",
+                  "maximumError": "2MB"
+                }
+              ],
+              "outputHashing": "all",
+              "optimization": true,
+              "sourceMap": false
+            },
+            "development": {
+              "optimization": false,
+              "extractLicenses": false,
+              "sourceMap": true
+            }
+          },
+          "defaultConfiguration": "production"
+        }
+      }
     }
   },
   "cli": {

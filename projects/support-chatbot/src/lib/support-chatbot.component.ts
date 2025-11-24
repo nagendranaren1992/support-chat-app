@@ -1,4 +1,4 @@
-import { Component, ViewChild, ElementRef, AfterViewChecked, ChangeDetectorRef } from '@angular/core';
+import { Component, ViewChild, ElementRef, AfterViewChecked, ChangeDetectorRef, Input, OnInit } from '@angular/core';
 import { HttpClient, HttpEventType } from '@angular/common/http';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
@@ -18,8 +18,15 @@ interface Message {
   standalone: true,
   imports: [CommonModule, FormsModule]
 })
-export class SupportChatbotComponent implements AfterViewChecked {
-  messages: Message[] = [{ from: 'bot', text: 'Hello! How can I help you today?' }];
+export class SupportChatbotComponent implements AfterViewChecked, OnInit {
+  @Input() apiUrl: string = 'http://localhost:3000';
+  @Input() chatApiEndpoint: string = '/api/chat';
+  @Input() ticketApiEndpoint: string = '/api/tickets';
+  @Input() botName: string = 'Qurix Support Assistant';
+  @Input() botAvatar: string = '/qurix.ico';
+  @Input() initialMessage: string = 'Hello! How can I help you today?';
+
+  messages: Message[] = [];
   userInput: string = '';
   chatHistory: { role: string, content: string }[] = [];
 
@@ -31,6 +38,11 @@ export class SupportChatbotComponent implements AfterViewChecked {
   isRecording: boolean = false;
 
   constructor(private http: HttpClient, private cdr: ChangeDetectorRef) { }
+
+  ngOnInit() {
+    // Initialize messages with the initial message (inputs are available in ngOnInit)
+    this.messages = [{ from: 'bot', text: this.initialMessage }];
+  }
 
   ngAfterViewChecked() {
     this.scrollToBottom();
@@ -62,7 +74,8 @@ export class SupportChatbotComponent implements AfterViewChecked {
     setTimeout(() => this.scrollToBottom(), 0);
 
     // Call backend AI chat API
-    this.http.post<{ reply: string }>('http://localhost:3000/api/chat', {
+    const chatUrl = `${this.apiUrl}${this.chatApiEndpoint}`;
+    this.http.post<{ reply: string }>(chatUrl, {
       message: userMsg,
       chatHistory: this.chatHistory
     }).subscribe({
@@ -220,7 +233,8 @@ export class SupportChatbotComponent implements AfterViewChecked {
     formData.append(type, file);
     formData.append('description', 'User support ticket attachment');
 
-    return this.http.post('http://localhost:3000/api/tickets', formData, {
+    const ticketUrl = `${this.apiUrl}${this.ticketApiEndpoint}`;
+    return this.http.post(ticketUrl, formData, {
       reportProgress: true,
       observe: 'events'
     }).subscribe(event => {
@@ -269,7 +283,8 @@ export class SupportChatbotComponent implements AfterViewChecked {
 
   getAIResponseForVideo() {
     this.chatHistory.push({ role: 'user', content: 'I have uploaded a screen recording.' });
-    this.http.post<{ reply: string }>('http://localhost:3000/api/chat', {
+    const chatUrl = `${this.apiUrl}${this.chatApiEndpoint}`;
+    this.http.post<{ reply: string }>(chatUrl, {
       message: 'I have uploaded a screen recording.',
       chatHistory: this.chatHistory
     }).subscribe({

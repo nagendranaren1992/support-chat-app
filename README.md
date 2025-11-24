@@ -1,4 +1,55 @@
-# SupportChatApp
+# Support Chat App - Angular Element
+
+This project contains a support chatbot that can be used as an **Angular Element (Web Component)** in any web application, including:
+
+- Angular 9+ projects
+- Angular 18+ projects
+- PrimeFaces/JSF projects
+- Any HTML/JavaScript application
+
+The chatbot is built as a standalone Angular component and packaged as a custom element that can be embedded anywhere.
+
+## Quick Start - Building the Angular Element
+
+To build the chatbot as a reusable Angular Element:
+
+```bash
+# Production build (optimized)
+npm run build:element:prod
+
+# Development build (with source maps)
+npm run build:element:dev
+```
+
+The built files will be in `dist/support-chatbot-element/` directory.
+
+## Usage
+
+See **[ANGULAR_ELEMENT_USAGE.md](./ANGULAR_ELEMENT_USAGE.md)** for detailed instructions on:
+
+- Using in Angular 9 projects
+- Using in Angular 18 projects
+- Using in PrimeFaces/JSF projects
+- Configuration options
+- Troubleshooting
+
+## Quick Example
+
+After building, include the scripts in your HTML:
+
+```html
+<link rel="stylesheet" href="path/to/styles.css" />
+<script src="path/to/polyfills.js"></script>
+<script src="path/to/main.js"></script>
+```
+
+Then use the custom element:
+
+```html
+<support-chatbot api-url="http://localhost:3000" bot-name="Support Assistant" initial-message="Hello! How can I help you?"> </support-chatbot>
+```
+
+---
 
 This project was generated using [Angular CLI](https://github.com/angular/angular-cli) version 20.0.4.
 

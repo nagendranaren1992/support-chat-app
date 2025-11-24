@@ -7,12 +7,16 @@
     "build": "ng build",
     "watch": "ng build --watch --configuration development",
     "test": "ng test",
+    "start:backend": "cd projects/backend && node server.js",
     "serve:ssr:support-chat-app": "node dist/support-chat-app/server/server.mjs",
     "build:element": "ng build support-chatbot-element",
     "build:element:prod": "ng build support-chatbot-element --configuration production",
     "build:element:dev": "ng build support-chatbot-element --configuration development",
     "install:all": "npm install && cd projects/backend && npm install",
     "install:backend": "cd projects/backend && npm install"
+  },
+  "engines": {
+    "node": ">=18.0.0"
   },
   "prettier": {
     "overrides": [

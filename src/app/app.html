@@ -1,1 +1,14 @@
-<app-support-chatbot></app-support-chatbot>
+<!-- Example: Pass username and empid -->
+<app-support-chatbot
+    [apiUrl]="'http://localhost:3000'"
+    [username]="'john.doe'"
+    [empid]="'EMP123'">
+</app-support-chatbot>
+
+<!-- Alternative: Pass as userData object -->
+<!--
+<app-support-chatbot
+    [apiUrl]="'http://localhost:3000'"
+    [userData]="{ username: 'john.doe', empid: 'EMP123' }">
+</app-support-chatbot>
+-->

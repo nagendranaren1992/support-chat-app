@@ -1,6 +1,6 @@
-import { Component, ViewChild, ElementRef, AfterViewChecked, ChangeDetectorRef, Input, OnInit } from '@angular/core';
+import { Component, ViewChild, ElementRef, AfterViewChecked, ChangeDetectorRef, Input, OnInit, OnChanges, SimpleChanges, Output, EventEmitter, Inject, PLATFORM_ID } from '@angular/core';
 import { HttpClient, HttpEventType } from '@angular/common/http';
-import { CommonModule } from '@angular/common';
+import { CommonModule, isPlatformBrowser } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 
 interface Message {
@@ -18,17 +18,26 @@ interface Message {
   standalone: true,
   imports: [CommonModule, FormsModule]
 })
-export class SupportChatbotComponent implements AfterViewChecked, OnInit {
+export class SupportChatbotComponent implements AfterViewChecked, OnInit, OnChanges {
   @Input() apiUrl: string = 'http://localhost:3000';
   @Input() chatApiEndpoint: string = '/api/chat';
   @Input() ticketApiEndpoint: string = '/api/tickets';
   @Input() botName: string = 'Qurix Support Assistant';
   @Input() botAvatar: string = '/qurix.ico';
   @Input() initialMessage: string = 'Hello! How can I help you today?';
+  @Input() userData: { username?: string; empid?: string } | string | null = null;
+  @Input() username: string = '';
+  @Input() empid: string = '';
+  @Output() onClose = new EventEmitter<void>();
+  @Output() onMinimize = new EventEmitter<void>();
 
   messages: Message[] = [];
   userInput: string = '';
   chatHistory: { role: string, content: string }[] = [];
+  isMinimized: boolean = false;
+  isVisible: boolean = false;
+  private _username: string = '';
+  private _empid: string = '';
 
   @ViewChild('scrollContainer') private scrollContainer!: ElementRef;
 
@@ -37,11 +46,116 @@ export class SupportChatbotComponent implements AfterViewChecked, OnInit {
   pendingVideoBlob: Blob | null = null;
   isRecording: boolean = false;
 
-  constructor(private http: HttpClient, private cdr: ChangeDetectorRef) { }
+  constructor(
+    private http: HttpClient,
+    private cdr: ChangeDetectorRef,
+    @Inject(PLATFORM_ID) private platformId: Object
+  ) { }
 
   ngOnInit() {
     // Initialize messages with the initial message (inputs are available in ngOnInit)
     this.messages = [{ from: 'bot', text: this.initialMessage }];
+
+    // Load user data from sessionStorage or use provided input
+    this.loadUserData();
+  }
+
+  ngOnChanges(changes: SimpleChanges) {
+    // Handle userData changes (can be object or JSON string for Angular elements)
+    if (changes['userData'] && this.userData) {
+      this.parseUserData();
+      this.saveUserDataToSession();
+    }
+
+    // Handle individual username/empid inputs (for easier Angular element usage)
+    if (changes['username']) {
+      this._username = this.username || '';
+      this.saveUserDataToSession();
+    }
+    if (changes['empid']) {
+      this._empid = this.empid || '';
+      this.saveUserDataToSession();
+    }
+
+    // Load user data if any input changed
+    if (changes['userData'] || changes['username'] || changes['empid']) {
+      this.loadUserData();
+    }
+  }
+
+  parseUserData() {
+    if (!this.userData) return;
+
+    try {
+      let userDataObj: { username?: string; empid?: string };
+
+      // If userData is a string (JSON), parse it (for Angular elements)
+      if (typeof this.userData === 'string') {
+        userDataObj = JSON.parse(this.userData);
+      } else {
+        // If it's already an object
+        userDataObj = this.userData;
+      }
+
+      // Update internal values
+      if (userDataObj.username) {
+        this._username = userDataObj.username;
+      }
+      if (userDataObj.empid) {
+        this._empid = userDataObj.empid;
+      }
+    } catch (e) {
+      console.error('Error parsing userData:', e);
+    }
+  }
+
+  saveUserDataToSession() {
+    if (isPlatformBrowser(this.platformId)) {
+      try {
+        const userData = {
+          username: this._username || this.username,
+          empid: this._empid || this.empid
+        };
+        const userDataJson = JSON.stringify(userData);
+        sessionStorage.setItem('chatbot_user_data', userDataJson);
+      } catch (e) {
+        console.error('Error saving user data to sessionStorage:', e);
+      }
+    }
+  }
+
+  loadUserData() {
+    // Priority: 1. Direct @Input properties, 2. Parsed userData, 3. sessionStorage
+    this._username = this.username || this._username || '';
+    this._empid = this.empid || this._empid || '';
+
+    // If we have userData, parse it
+    if (this.userData) {
+      this.parseUserData();
+    }
+
+    // If still no data, try sessionStorage (only in browser)
+    if (!this._username && !this._empid && isPlatformBrowser(this.platformId)) {
+      try {
+        const storedData = sessionStorage.getItem('chatbot_user_data');
+        if (storedData) {
+          const userData = JSON.parse(storedData);
+          this._username = userData.username || '';
+          this._empid = userData.empid || '';
+        }
+      } catch (e) {
+        console.error('Error parsing user data from sessionStorage:', e);
+      }
+    }
+  }
+
+  // Getters for username and empid
+  get currentUsername(): string {
+    return this._username || this.username || '';
+  }
+
+  get currentEmpid(): string {
+    return this._empid || this.empid || '';
   }
 
   ngAfterViewChecked() {
@@ -77,7 +191,9 @@ export class SupportChatbotComponent implements AfterViewChecked, OnInit {
     const chatUrl = `${this.apiUrl}${this.chatApiEndpoint}`;
     this.http.post<{ reply: string }>(chatUrl, {
       message: userMsg,
-      chatHistory: this.chatHistory
+      chatHistory: this.chatHistory,
+      username: this.currentUsername,
+      empid: this.currentEmpid
     }).subscribe({
       next: (res) => {
         this.messages.push({ from: 'bot', text: res.reply });
@@ -233,6 +349,14 @@ export class SupportChatbotComponent implements AfterViewChecked, OnInit {
     formData.append(type, file);
     formData.append('description', 'User support ticket attachment');
 
+    // Add username and empid to form data
+    if (this.currentUsername) {
+      formData.append('username', this.currentUsername);
+    }
+    if (this.currentEmpid) {
+      formData.append('empid', this.currentEmpid);
+    }
+
     const ticketUrl = `${this.apiUrl}${this.ticketApiEndpoint}`;
     return this.http.post(ticketUrl, formData, {
       reportProgress: true,
@@ -286,7 +410,9 @@ export class SupportChatbotComponent implements AfterViewChecked, OnInit {
     const chatUrl = `${this.apiUrl}${this.chatApiEndpoint}`;
     this.http.post<{ reply: string }>(chatUrl, {
       message: 'I have uploaded a screen recording.',
-      chatHistory: this.chatHistory
+      chatHistory: this.chatHistory,
+      username: this.currentUsername,
+      empid: this.currentEmpid
     }).subscribe({
       next: (res) => {
         this.messages.push({ from: 'bot', text: res.reply });
@@ -300,5 +426,24 @@ export class SupportChatbotComponent implements AfterViewChecked, OnInit {
         setTimeout(() => this.scrollToBottom(), 0);
       }
     });
+  }
+
+  openChat() {
+    this.isVisible = true;
+    // Load user data when opening chat
+    this.loadUserData();
+    if (this.messages.length === 0) {
+      this.messages = [{ from: 'bot', text: this.initialMessage }];
+    }
+  }
+
+  closeChat() {
+    this.isVisible = false;
+    this.onClose.emit();
+  }
+
+  minimizeChat() {
+    this.isMinimized = !this.isMinimized;
+    this.onMinimize.emit();
   }
 }

@@ -1,57 +1,72 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Support Chatbot Element Test</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            padding: 20px;
-            background: #f5f5f5;
-        }
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-        }
-        h1 {
-            text-align: center;
-            color: #333;
-        }
-        .chatbot-wrapper {
-            display: flex;
-            justify-content: center;
-            margin-top: 40px;
-        }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Support Chatbot Element Test</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      padding: 20px;
+      background: #f5f5f5;
+    }
+
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+
+    h1 {
+      text-align: center;
+      color: #333;
+    }
+
+    .chatbot-wrapper {
+      display: flex;
+      justify-content: center;
+      margin-top: 40px;
+    }
+  </style>
 </head>
+
 <body>
-    <div class="container">
-        <h1>Support Chatbot Element Test Page</h1>
-        <p style="text-align: center; color: #666;">
-            This page tests the Angular Element custom element. 
-            Make sure to build the element first using: <code>npm run build:element</code>
-        </p>
-        
-        <div class="chatbot-wrapper">
-            <!-- The custom element -->
+  <div class="container">
+    <h1>Support Chatbot Element Test Page</h1>
+    <p style="text-align: center; color: #666;">
+      This page tests the Angular Element custom element.
+      Make sure to build the element first using: <code>npm run build:element</code>
+    </p>
+
+    <div class="chatbot-wrapper">
+      <!-- The custom element -->
+      <!-- Example 1: Using individual attributes (recommended) -->
+      <support-chatbot api-url="http://localhost:3000" chat-api-endpoint="/api/chat" ticket-api-endpoint="/api/tickets"
+        bot-name="Test Support Bot" bot-avatar="/qurix.ico" initial-message="Hello! This is a test. How can I help you?"
+        username="test.user" empid="EMP001">
+      </support-chatbot>
+
+      <!-- Example 2: Using userData as JSON string (alternative) -->
+      <!--
             <support-chatbot
                 api-url="http://localhost:3000"
                 chat-api-endpoint="/api/chat"
                 ticket-api-endpoint="/api/tickets"
                 bot-name="Test Support Bot"
                 bot-avatar="/qurix.ico"
-                initial-message="Hello! This is a test. How can I help you?">
+                initial-message="Hello! This is a test. How can I help you?"
+                user-data='{"username":"test.user","empid":"EMP001"}'>
             </support-chatbot>
-        </div>
+            -->
     </div>
+  </div>
 
-    <!-- 
+  <!--
         In a real scenario, these would be the built files from dist/support-chatbot-element/
         For testing, you can serve this file after building the element
     -->
-    <script src="../dist/support-chatbot-element/polyfills.js"></script>
-    <script src="../dist/support-chatbot-element/main.js"></script>
+  <script src="../dist/support-chatbot-element/polyfills.js"></script>
+  <script src="../dist/support-chatbot-element/main.js"></script>
 </body>
-</html>
 
+</html>
